@@ -1,3 +1,5 @@
 __pycache__/
+.idea/
 urls.txt
 *.zip
+output.csv
