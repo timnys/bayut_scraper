@@ -1,7 +1,9 @@
 import requests  
 from bs4 import BeautifulSoup  
 import json  
-from selenium import webdriver  
+import time
+from selenium import webdriver
+from selenium_stealth import stealth
 from selenium.webdriver.chrome.service import Service as ChromeService  
 from webdriver_manager.chrome import ChromeDriverManager  
 from selenium.webdriver.common.by import By  
@@ -11,20 +13,30 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException  
 
 def fetch_all_property_details(url):  
-    property_listing = {  
+    property_listing = {
+        "url": url,
+        "price": "",
+        "currency": "",
+        "location": "",
         "bed": "NA",  
         "bath": "NA",  
         "sqft": "NA",
         "description": "",  
         "car_parking": "NA",  
-        "type": "NA", 
+        "type": "NA",
+        "purpose": "NA",
+        "trucheck_date": "NA",
+        "reference_no": "NA",
+        "average_rent": "NA",
+        "completion_status": "NA",
         "fitness": "NA", 
         "swimming_pool": "NA",
         "floors": "NA",
         "total_floors": "NA",
         "furnishing": "NA",  
         "elevators": "NA",  
-        "completion_year": "NA",  
+        "completion_year": "NA",
+        "added_on": "NA",
         "security_staff": "NA",  
         "central_heating": "NA",  
         "centrally_air-conditioned": "NA",  
@@ -49,7 +61,17 @@ def fetch_all_property_details(url):
                 if stat := stats_div.find('span', {'aria-label': 'Baths'}):  
                     property_listing["bath"] = stat.text.strip()  
                 if stat := stats_div.find('span', {'aria-label': 'Area'}):  
-                    property_listing["sqft"] = stat.find('h4').text.strip() if stat.find('h4') else "NA"  
+                    property_listing["sqft"] = stat.find('h4').text.strip() if stat.find('h4') else "NA"
+            basic_info_div = soup.find('div', {'aria-label': 'Property basic info'})  
+            if basic_info_div:
+                if info := basic_info_div.find('span', {'aria-label': 'Price'}):
+                    property_listing["price"] = info.text.strip()
+                if info := basic_info_div.find('span', {'aria-label': 'Currency'}):
+                    property_listing["currency"] = info.text.strip()
+            property_header = soup.find('div', {'aria-label': 'Property header'})  
+            if property_header:
+                property_listing["location"] = property_header.text.strip()
+              
         except Exception:  
             pass  
 
@@ -70,15 +92,62 @@ def fetch_all_property_details(url):
         # Initialize WebDriver  
         chrome_options = Options()  
         chrome_options.add_argument("--headless")  
-        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)  
+        chrome_options.add_argument("--no-sandbox")
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options) 
+        stealth(driver,
+            languages=["en-US", "en"],
+            vendor="Google Inc.",
+            platform="Linux",
+            webgl_vendor="Intel Inc.",
+            renderer="Intel Iris OpenGL Engine",
+            fix_hairline=True,
+            )
+        
         try:  
             driver.get(url)  
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))  
-
+            driver.get(url)  
+            time.sleep(2)
             try:  
                 property_listing["type"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Type']").text.strip()  
             except NoSuchElementException:  
-                pass  
+                pass
+            try:  
+                property_listing["purpose"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Purpose']").text.strip()  
+            except NoSuchElementException:  
+                pass
+            try:  
+                property_listing["trucheck_date"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Trucheck date']").text.strip()  
+            except NoSuchElementException:  
+                pass
+            try:  
+                property_listing["average_rent"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Average Rent']").text.strip()  
+            except NoSuchElementException:  
+                pass
+            try:  
+                property_listing["completion_status"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Completion status']").text.strip()  
+            except NoSuchElementException:  
+                pass
+            try:  
+                property_listing["added_on"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Reactivated date']").text.strip()  
+            except NoSuchElementException:  
+                pass
+            try:  
+                property_listing["reference_no"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Reference']").text.strip()  
+            except NoSuchElementException:  
+                pass
+            try:  
+                property_listing["developer"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Developer']").text.strip()  
+            except NoSuchElementException:  
+                pass
+            try:  
+                property_listing["usage"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Usage']").text.strip()  
+            except NoSuchElementException:  
+                pass
+            try:  
+                property_listing["ownership"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Ownership']").text.strip()  
+            except NoSuchElementException:  
+                pass
             try:  
                 property_listing["furnishing"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Furnishing']").text.strip()  
             except NoSuchElementException:  
@@ -91,6 +160,7 @@ def fetch_all_property_details(url):
                 property_listing["completion_year"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Year of Completion']").text.strip()  
             except NoSuchElementException:  
                 pass  
+
             try:  
                 property_listing["car_parking"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Total Parking Spaces']").text.strip()
             except NoSuchElementException:  
@@ -146,7 +216,7 @@ def fetch_all_property_details(url):
     return property_listing  
 
 
-# # Test the function by providing the URL of a property listing  
-# url = "https://www.bayut.com/property/details-10119730.html"  
-# property_details = fetch_all_property_details(url)  
-# print(property_details)
+# Test the function by providing the URL of a property listing  
+url = "https://www.bayut.com/property/details-9373379.html"  
+property_details = fetch_all_property_details(url)  
+print(property_details)
