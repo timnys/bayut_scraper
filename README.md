@@ -20,7 +20,7 @@ The **Bayut Scraper** is a Python tool designed to scrape property listings from
 - Python 3.x
 - pip (Python package installer)
 
-## Setup Instructions
+## Setup Instructions (For virtual env)
 
 To set up the environment, choose one of the following scripts based on your operating system:
 
