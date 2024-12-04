@@ -11,7 +11,7 @@ The **Bayut Scraper** is a Python tool designed to scrape property listings from
 
 - [Requirements](#requirements)
 - [Setup Instructions](#setup-instructions)
-- [How to Use](#how-to-use)
+- [Other Option](#other-option)
 - [Output](#output)
 - [License](#license)
 
@@ -56,6 +56,7 @@ The `run_script.sh` performs similar steps as the Windows script, creating and s
 @echo off
 call myenv\Scripts\activate
 python myscript.py
+python main.py
 deactivate
 ```
 
@@ -97,15 +98,14 @@ if __name__ == "__main__":
     main()
 ```
 
-## How to Use
+## Other option
 
-After setting up the environment and installing the packages, run the main scraper script:
+You can install the python packages globally and run `main.py` directly without using virtual env
 
 ```bash
+pip install -r requirements.txt
 python main.py
 ```
-
-This will execute the scraper and begin collecting data from Bayut.
 
 ## Output
 
