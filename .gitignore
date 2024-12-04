@@ -3,3 +3,4 @@ __pycache__/
 urls.txt
 *.zip
 output.csv
+myenv/

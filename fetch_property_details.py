@@ -107,7 +107,7 @@ def fetch_all_property_details(url):
             driver.get(url)  
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))  
             driver.get(url)  
-            time.sleep(2)
+            time.sleep(3)
             try:  
                 property_listing["type"] = driver.find_element(By.CSS_SELECTOR, "span[aria-label='Type']").text.strip()  
             except NoSuchElementException:  
@@ -217,6 +217,6 @@ def fetch_all_property_details(url):
 
 
 # Test the function by providing the URL of a property listing  
-url = "https://www.bayut.com/property/details-9373379.html"  
-property_details = fetch_all_property_details(url)  
-print(property_details)
+# url = "https://www.bayut.com/property/details-9373379.html"  
+# property_details = fetch_all_property_details(url)  
+# print(property_details)
