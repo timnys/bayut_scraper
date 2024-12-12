@@ -4,3 +4,4 @@ urls.txt
 *.zip
 output.csv
 myenv/
+*.csv
